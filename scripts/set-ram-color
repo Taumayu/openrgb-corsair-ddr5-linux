@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/corsair-dram-rgb"
+CONFIG_FILE="$CONFIG_DIR/color.conf"
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+BIN_PATH="$SCRIPT_DIR/corsair-dram-rgb"
+OPENRGB_DIR="$SCRIPT_DIR/openrgb-1.1"
+
+if [ $# -eq 0 ]; then
+    if [ -f "$CONFIG_FILE" ]; then
+        echo "Couleur actuellement configurée pour le démarrage : $(cat "$CONFIG_FILE")"
+    else
+        echo "Aucune couleur configurée par défaut (défaut : #20ff15)."
+    fi
+    echo ""
+    "$BIN_PATH" --status
+    echo ""
+    echo "Usage :"
+    echo "  $0 <couleur>    # Applique et sauvegarde la couleur pour tout le matériel"
+    echo "Exemples :"
+    echo "  $0 \"#20ff15\"    # Code hexadécimal"
+    echo "  $0 red          # Rouge"
+    echo "  $0 cyan         # Cyan"
+    echo "  $0 blue         # Bleu"
+    echo "  $0 32 255 21    # Valeurs RGB"
+    echo "  $0 off          # Éteint les LEDs"
+    exit 0
+fi
+
+# 1. Appliquer à la RAM Corsair DDR5
+"$BIN_PATH" "$@"
+
+# 2. Appliquer également à la Carte Mère et au GPU via OpenRGB
+case "$1" in
+    --help|-h|--status|--info)
+        ;;
+    *)
+        RAW="$1"
+        CLEAN_HEX="${RAW#"#"}"
+        if [[ "$CLEAN_HEX" =~ ^[0-9a-fA-F]{6}$ ]]; then
+            if [ -f "$OPENRGB_DIR/usr/bin/OpenRGB" ]; then
+                export LD_LIBRARY_PATH="$OPENRGB_DIR/usr/lib"
+                "$OPENRGB_DIR/usr/bin/OpenRGB" -d "Gigabyte Radeon RX 9070 GRE GAMING OC 12G" -m static -c "$CLEAN_HEX" >/dev/null 2>&1 || true
+                "$OPENRGB_DIR/usr/bin/OpenRGB" -d "ASRock B850 Pro RS" -m static -c "$CLEAN_HEX" >/dev/null 2>&1 || true
+                "$OPENRGB_DIR/usr/bin/OpenRGB" -d "Corsair Vengeance RGB DDR5" -m direct -c "$CLEAN_HEX" >/dev/null 2>&1 || true
+            fi
+        fi
+
+        mkdir -p "$CONFIG_DIR"
+        echo "$*" > "$CONFIG_FILE"
+        echo "✓ Configuration mise à jour : '$*' sera appliqué à chaque démarrage (Carte mère, RAM, GPU)."
+        ;;
+esac

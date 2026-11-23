@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=OpenRGB Apply Colors
+Comment=Applique les couleurs RGB au démarrage de la session graphique KDE
+Exec=/home/tauma/Project/OpenRGB/apply-ram-color-boot.sh
+Terminal=false
+NoDisplay=true
+X-KDE-autostart-phase=2
+

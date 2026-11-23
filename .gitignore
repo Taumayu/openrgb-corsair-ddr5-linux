@@ -1,0 +1,10 @@
+# Binaries & build artifacts
+bin/
+*.o
+*.so
+*.AppImage
+
+# Logs & cache
+*.log
+.DS_Store
+*.tmp

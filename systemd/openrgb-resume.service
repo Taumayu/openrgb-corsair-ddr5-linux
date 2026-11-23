@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenRGB - Reapply RGB colors on wake from sleep
+After=suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target
+
+[Service]
+Type=oneshot
+User=tauma
+Group=tauma
+Environment=XDG_CONFIG_HOME=/home/tauma/.config
+ExecStartPre=/bin/sleep 2
+ExecStart=/home/tauma/Project/OpenRGB/apply-ram-color-boot.sh
+
+[Install]
+WantedBy=suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target
+

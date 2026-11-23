@@ -1,0 +1,12 @@
+[Unit]
+Description=Corsair Vengeance RGB DDR5 & OpenRGB Boot Service
+After=graphical-session.target plasma-workspace.target default.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sleep 3
+ExecStart=/home/tauma/Project/OpenRGB/apply-ram-color-boot.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=graphical-session.target default.target
